@@ -19,7 +19,7 @@ inputs:
     description: Install extra packages by apk
 runs:
   using: docker
-  image: Dockerfile
+  image: docker/latex-action/Dockerfile
   args:
     - ${{ inputs.root_file }}
     - ${{ inputs.working_directory }}

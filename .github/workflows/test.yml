@@ -1,8 +1,10 @@
 name: Test Github Actions
 on:
   push:
-  schedule:
-    - cron: '0 0 1 * *'
+    paths:
+      - "action.yml"
+      - "docker/latex-action/*"
+      - "test/*"
 jobs:
   test:
     runs-on: ubuntu-latest

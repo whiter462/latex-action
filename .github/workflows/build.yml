@@ -1,0 +1,32 @@
+name: Docker Image CI
+on:
+  push:
+    paths:
+      - "docker/base/*"
+  schedule:
+    - cron: "0 0 1 * *"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v1
+      - name: Build the Docker image
+        run: |
+          docker build docker/base --tag latex-action-base
+      - name: Test the Docker image
+        run: |
+          docker run --rm latex-action-base biber --version
+          docker run --rm latex-action-base latexmk --version
+          docker run --rm latex-action-base pdflatex --version
+          docker run --rm latex-action-base texliveonfly --version
+      - name: Deploy the Docker image
+        run: |
+          docker login docker.pkg.github.com -u xu-cheng -p "$GITHUB_TOKEN"
+          VERSION="$(git describe --tags)-$(date "+%Y%m%d")"
+          docker tag latex-action-base docker.pkg.github.com/xu-cheng/latex-action/base:$VERSION
+          docker tag latex-action-base docker.pkg.github.com/xu-cheng/latex-action/base:latest
+          docker push docker.pkg.github.com/xu-cheng/latex-action/base
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
